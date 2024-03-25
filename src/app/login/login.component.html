@@ -1,0 +1,50 @@
+<div class="flex-column y-center app-container">
+  <form 
+    class="login-form flex-column gap-10" 
+    [formGroup]="loginForm"
+    (submit)="onSubmit($event)" >
+    <mat-form-field appearance="outline" >
+      <mat-label for="tx-login-username" >Usuário</mat-label>
+      <input matInput 
+        type="text"
+        id="tx-login-username" 
+        autofocus
+        formControlName="username"
+        autocomplete="username" />
+      @if (username.hasError("required")) {
+        <mat-error>Informe o usuário</mat-error>   
+      }
+      @else if (username.hasError('notfound')) {
+        <mat-error>Usuário não encontrado </mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" >
+      <mat-label for="tx-login-password" >Senha</mat-label>
+      <input matInput 
+        id="tx-login-password" 
+        [type]="isPasswordVisible ? 'text' : 'password'"
+        formControlName="password"
+        autocomplete="off" />
+
+      <button 
+        type="button" 
+        matSuffix mat-icon-button 
+        (click)="isPasswordVisible = !isPasswordVisible" >
+        <mat-icon>{{isPasswordVisible ? 'visibility' : 'visibility_off'}}</mat-icon>
+      </button>
+      @if (password.hasError("required")) {
+        <mat-error>Informe sua senha</mat-error>   
+      }
+      @else if(password.hasError("invalid")) {
+        <mat-error>Senha incorreta</mat-error>
+      }
+    </mat-form-field>
+
+    <button 
+      mat-flat-button 
+      color="primary" 
+      type="submit" >Entrar</button>
+    
+  </form>
+</div>

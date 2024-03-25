@@ -1,0 +1,26 @@
+<mat-toolbar color="primary" >
+  <span>Enquetes</span>
+  <span class="example-spacer"></span>
+  @if (!(isOnline$ | async) && (responses$ | async)!.length > 0) {
+    <button mat-icon-button class="example-icon" aria-label="Meu perfil">
+      <mat-icon>cloud_upload</mat-icon>
+    </button>
+  }
+  <button mat-icon-button class="example-icon" aria-label="Meu perfil">
+    <mat-icon>account_circle</mat-icon>
+  </button>
+</mat-toolbar>
+
+<div class="app-container" >
+  <mat-action-list role="list">
+    <h1 class="text-center">Selecione uma enquete</h1>
+    @for (survey of surveys;track survey) {
+      <mat-list-item (click)="showSurvey(survey.surveyId!)" >
+        <mat-icon matListItemIcon>checkbook</mat-icon>
+        <div matListItemTitle>{{survey.name}}</div>
+        <div matListItemLine>Ativo até {{survey.expirationDate | date}}</div>
+      </mat-list-item>
+      <mat-divider></mat-divider>
+    }
+  </mat-action-list>
+</div>

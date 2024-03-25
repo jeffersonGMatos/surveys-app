@@ -1,0 +1,104 @@
+<mat-toolbar color="primary" >
+  <button mat-icon-button class="example-icon" aria-label="Meu perfil" (click)="back()" >
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <span></span>
+  <span class="example-spacer"></span>
+
+  @if (!(isOnline$ | async) && (responses$ | async)!.length > 0) {
+    <button mat-icon-button class="example-icon" aria-label="Meu perfil">
+      <mat-icon>cloud_upload</mat-icon>
+    </button>
+  }
+
+  <button mat-icon-button class="example-icon" aria-label="Meu perfil">
+    <mat-icon>account_circle</mat-icon>
+  </button>
+</mat-toolbar>
+
+<form class="app-container" [formGroup]="surveyForm" (submit)="onSubmit()" >
+  @if (survey) {
+    <h2 class="text-center">{{survey.name}}</h2>
+
+    <div class="flex-column gap-10" >
+      <mat-form-field appearance="outline" >
+        <mat-label>Nome</mat-label>
+        <input 
+          type="text" 
+          matInput
+          formControlName="name"
+          tabindex="1"
+          autofocus
+          required
+          autocomplete="off" />
+
+          @if (name.hasError("required")) {
+            <mat-error>Informe o nome do entrevistado</mat-error>
+          }
+      </mat-form-field>
+  
+      <mat-form-field appearance="outline" >
+        <mat-label>Idade</mat-label>
+        <input 
+          type="number" 
+          matInput
+          formControlName="age"
+          tabindex="2"
+          min="1"
+          max="130"
+          required
+          autocomplete="off"
+          autofocus />
+        @if (age.hasError("required")) {
+          <mat-error>Informe a idade do entrevistado</mat-error>
+        }
+      </mat-form-field>
+  
+      <mat-form-field appearance="outline" >
+        <mat-label>Sexo</mat-label>
+        <mat-select 
+          tabindex="3" 
+          formControlName="gender"
+          required >
+          @for (gender of genders; track gender) {
+            <mat-option [value]="gender">{{gender}}</mat-option>
+          }
+        </mat-select>
+
+        @if (gender.hasError("required")) {
+          <mat-error>Informe o sexo do entrevistado</mat-error>
+        }
+      </mat-form-field>
+  
+      <mat-form-field appearance="outline" >
+        <mat-label>Bairro</mat-label>
+        <input 
+          type="text" 
+          matInput
+          tabindex="4"
+          required
+          formControlName="neighborhood"
+          autofocus />
+
+        @if (neighborhood.hasError("required")) {
+          <mat-error>Informe o bairro do entrevistado</mat-error>
+        }
+      </mat-form-field>
+
+      @for (question of survey.questions; track question.questionId;let i = $index) {
+        <div>
+          <p>{{question.description}}</p>
+          <mat-selection-list 
+            [formControl]="asFormControl(asFormGroup(responses.at(i)).get('response'))"
+            [multiple]="asNumber(question.selectionNumber) > 1">
+            @for (option of question.options; track option.optionId) {
+              <mat-list-option [value]="option.optionId">{{option.description}}</mat-list-option>
+            }
+          </mat-selection-list>
+        </div>
+      }
+
+      <button mat-flat-button color="primary" type="submit" >Enviar</button>
+    </div>
+  }
+</form>

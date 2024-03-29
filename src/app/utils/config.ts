@@ -1,3 +1,4 @@
 export const environment = {
-  api_host: `http://172.30.30.1/surveys/api`
+  api_host: `https://enquetes.jgmdev.com.br/api/private`,
+  api_host_login: `https://enquetes.jgmdev.com.br/api/public`
 }

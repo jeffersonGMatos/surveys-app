@@ -1,0 +1,11 @@
+<ifModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} off
+	RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  #reescreve as páginas php
+	RewriteRule ^login$ index.html [NC,L]
+	RewriteRule ^surveys\/([A-Za-z0-9-\/\.]+)$ index.html [NC,L]
+	RewriteRule ^confirme\/([A-Za-z0-9-\/\.]+)$ index.html [NC,L]
+
+</ifModule>

@@ -4,6 +4,7 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatButtonModule } from "@angular/material/button";
 import { MatInputModule } from "@angular/material/input";
 import { MatIconModule } from "@angular/material/icon";
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 import { AppService } from "../app.service";
 import { ActivatedRoute, Router } from "@angular/router";
 
@@ -14,11 +15,13 @@ import { ActivatedRoute, Router } from "@angular/router";
     MatInputModule, 
     ReactiveFormsModule,
     MatButtonModule,
-    MatIconModule],
+    MatIconModule,
+    MatProgressSpinnerModule],
   templateUrl: 'login.component.html',
   styleUrl: 'login.component.css'
 })
 export class LoginComponent {
+  isLoading = false;
 
   public loginForm = new FormGroup({
     username: new FormControl<string>('', Validators.required),
@@ -43,16 +46,18 @@ export class LoginComponent {
 
   private login() {
     const credentials = this.loginForm.value;
+    this.isLoading = true;
     this.loginForm.markAsPending();
-
     this.appService.login(credentials).subscribe(
       response => {
+        this.isLoading = false;
+
         if (!response.ok) {
-          if (response.errorCode === 'INVALID_CREDENTIALS_USER')
-            this.username.setErrors({ notfound: true});
+          if (response.error === 'INVALID_CREDENTIALS_USER')
+            this.username.setErrors({ notfound: true });
           else
-          if (response.errorCode === 'INVALID_CREDENTIALS_PASSWORD')
-            this.password.setErrors({ invalid: true});
+          if (response.error === 'INVALID_CREDENTIALS_PASSWORD')
+            this.password.setErrors({ invalid: true });
         } else 
           this.redirect();
       }
@@ -65,12 +70,12 @@ export class LoginComponent {
     if (redirect)
       this.router.navigateByUrl(redirect)
     else
-      this.router.navigate(['home'])
+      this.router.navigate(['/'])
   }
 
   public onSubmit(ev: SubmitEvent) {
     ev.preventDefault();
-    if (this.loginForm.valid) {
+    if (this.loginForm.valid && !this.isLoading) {
       this.login();
     }
   }

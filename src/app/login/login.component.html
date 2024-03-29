@@ -45,6 +45,12 @@
       mat-flat-button 
       color="primary" 
       type="submit" >Entrar</button>
+
+    @if (isLoading) {
+      <div class="flex-row x-center">
+        <mat-spinner diameter="40" ></mat-spinner>
+      </div>
+    }
     
   </form>
 </div>

@@ -6,13 +6,18 @@
   <span class="example-spacer"></span>
 
   @if (!(isOnline$ | async) && (responses$ | async)!.length > 0) {
-    <button mat-icon-button class="example-icon" aria-label="Meu perfil">
-      <mat-icon>cloud_upload</mat-icon>
+    <button mat-icon-button class="example-icon" aria-label="Sem acesso" (click)="retry()" >
+      <mat-icon>pending</mat-icon>
+    </button>
+  }
+  @else {
+    <button mat-icon-button class="example-icon" aria-label="Tudo Certo" >
+      <mat-icon>done_all</mat-icon>
     </button>
   }
 
-  <button mat-icon-button class="example-icon" aria-label="Meu perfil">
-    <mat-icon>account_circle</mat-icon>
+  <button mat-icon-button class="example-icon" aria-label="Sair" (click)="logout()">
+    <mat-icon>logout</mat-icon>
   </button>
 </mat-toolbar>
 
@@ -99,6 +104,12 @@
       }
 
       <button mat-flat-button color="primary" type="submit" >Enviar</button>
+    </div>
+  }
+
+  @if (isLoading) {
+    <div class="flex-row x-center">
+      <mat-spinner diameter="40" ></mat-spinner>
     </div>
   }
 </form>

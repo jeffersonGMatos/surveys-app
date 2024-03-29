@@ -9,7 +9,7 @@ import { Survey } from "./survey/survey";
 @Injectable({
   providedIn: 'root'
 })
-export class AppService implements OnInit {
+export class AppService {
   private _authJwt: string | null = null;
   private window = this.windowService.getWindow();
   public user: BehaviorSubject<User | null> = new BehaviorSubject<User | null>(null);
@@ -85,10 +85,11 @@ export class AppService implements OnInit {
     return (error: HttpErrorResponse): Observable<T> => {
 
       if (error.status == 0 || error.status == 504) {
+        this._isOnline.next(false);
         if (storageKey) {
-          const user = this.window.localStorage.getItem(storageKey);
-          if (user)
-            return of(this._responses.next(JSON.parse(user)) as T);
+          const value = this.window.localStorage.getItem(storageKey);
+          if (value)
+            return of(JSON.parse(value) as T);
         }
       }
 
@@ -99,7 +100,11 @@ export class AppService implements OnInit {
 
   public getSurveys(): Observable<Survey[]> {
     return this._http.get<Survey[]>(`${environment.api_host}/surveys?onlyActive=true`).pipe(
-      catchError(this.handleError([], 'surveys'))
+      catchError(this.handleError([], 'surveys')),
+      tap(value => {
+        if (value)
+          this.window.localStorage.setItem(`surveys`, JSON.stringify(value));
+      })
     )
   }
 
@@ -111,7 +116,8 @@ export class AppService implements OnInit {
       "Content-type": "application/json"
     });
 
-    return this._http.post(`${environment.api_host}/public/auth`, {}, {headers}).pipe(
+    return this._http.post(`${environment.api_host_login}/auth`, {}, {headers})
+    .pipe(
       catchError((err: HttpErrorResponse) => 
         of({
           ok: false,
@@ -131,7 +137,6 @@ export class AppService implements OnInit {
 
       })
     )
-
   }
 
   public auth(): Observable<any> {
@@ -156,43 +161,56 @@ export class AppService implements OnInit {
     )
   }
 
+  logout() {
+    this.authJwt = null;
+    this.user.next(null);
+    this.window.localStorage.clear();
+  }
+
   public getSurvey(surveyId: string): Observable<Survey | undefined> {
     return this._http.get<any>(`${environment.api_host}/surveys/${surveyId}`).pipe(
       catchError(this.handleError(undefined, `survey_${surveyId}`)),
       map(survey => {
-        if (survey)
+        if (survey) {
+          this.window.localStorage.setItem(`survey_${surveyId}`, JSON.stringify(survey));
+
           return {
             ...survey,
             expirationDate: new Date(`${survey.expirationDate} 03:00:00`)
           } as Survey
+        }
 
         return undefined
       })
     )
   }
 
-  public saveResponse(response: any) {
+  public saveResponse(response?: any) {
     const responses = Array.from(this._responses.value);
-    const idx = responses.length;
+    if (response) {
+      const idx = responses.length;
+      responses[idx] = response;
 
-    responses[idx] = response;
+      this._responses.next(responses);
+    }    
 
-    this._responses.next(responses);
-    this.sendResponse(idx).subscribe(success => {
-      if (success) {
-        let arr = Array.from(this._responses.value);
-        arr.splice(idx, 1);
-        this._responses.next(arr);
-      } 
+    responses.forEach((_, idx) => {
+      this.sendResponse(idx).subscribe(success => {
+        if (success) {
+          let arr = Array.from(this._responses.value);
+          arr.splice(idx, 1);
+          this._responses.next(arr);
+        } 
+      })
     })
+    
   }
 
-  ngOnInit() {
-    this.initResponses();
-
-    this._responses.subscribe(value =>
+  initResponse() {
+    this.responses$.subscribe(value => {
       this.window.localStorage.setItem('responses', JSON.stringify(value))
-    );
+    });
+    this.initResponses();
   }
 
 }

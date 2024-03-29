@@ -6,7 +6,7 @@ import { environment } from "../config";
 
 export const AuthInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> => {
   const appService = inject<AppService>(AppService);
-  const exp = new RegExp(`${environment.api_host}/public/`);
+  const exp = new RegExp(`${environment.api_host_login}/`);
   let headers = req.headers;
 
   if (exp.test(req.url) === false && appService.authJwt)

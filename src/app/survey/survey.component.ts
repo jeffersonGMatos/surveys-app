@@ -13,6 +13,7 @@ import { MatButtonModule } from "@angular/material/button";
 import { MatToolbarModule } from "@angular/material/toolbar";
 import { MatIconModule } from "@angular/material/icon";
 import { CommonModule } from "@angular/common";
+import { MatProgressSpinner } from "@angular/material/progress-spinner";
 //import {MatSnackBar, MatSnackBarModule} from '@angular/material/snack-bar';
 
 @Component({
@@ -29,12 +30,13 @@ import { CommonModule } from "@angular/common";
     MatToolbarModule,
     MatIconModule,
     CommonModule,
+    MatProgressSpinner,
     //MatSnackBarModule
   ],
   styleUrl: 'survey.component.css'
 })
 export class SurveyComponent implements OnInit {
-  public isLoading = false;
+  public isLoading = true;
   public survey?: Survey;
 
   public readonly isOnline$ = this.appService.isOnline$
@@ -114,9 +116,10 @@ export class SurveyComponent implements OnInit {
   }
 
   public onSubmit() {
-    if (this.surveyForm.valid) {
+    if (this.surveyForm.valid && !this.isLoading) {
+      this.isLoading = true;
       this.appService.saveResponse(this.surveyForm.value);
-      this.router.navigate([`confirme/${this.survey?.surveyId}`])
+      this.router.navigate([`confirme/${this.survey?.surveyId}`]);
       /*
       this._snackBar.open('Obrigado por participar', 'Splash', {
         horizontalPosition: 'center',
@@ -128,6 +131,15 @@ export class SurveyComponent implements OnInit {
 
   public back() {
     this.router.navigate(['../'])
+  }
+
+  public retry() {
+    this.appService.saveResponse();
+  }
+
+  public logout() {
+    this.appService.logout();
+    this.router.navigate(['login']);
   }
 
   ngOnInit(): void {

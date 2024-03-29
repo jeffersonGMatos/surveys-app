@@ -2,16 +2,24 @@
   <span>Enquetes</span>
   <span class="example-spacer"></span>
   @if (!(isOnline$ | async) && (responses$ | async)!.length > 0) {
-    <button mat-icon-button class="example-icon" aria-label="Meu perfil">
-      <mat-icon>cloud_upload</mat-icon>
+    <button mat-icon-button class="example-icon" aria-label="Sem acesso" (click)="retry()" >
+      <mat-icon>pending</mat-icon>
     </button>
   }
-  <button mat-icon-button class="example-icon" aria-label="Meu perfil">
-    <mat-icon>account_circle</mat-icon>
+  @else {
+    <button mat-icon-button class="example-icon" aria-label="Tudo Certo" >
+      <mat-icon>done_all</mat-icon>
+    </button>
+  }
+  <button mat-icon-button class="example-icon" aria-label="Sair" (click)="logout()" >
+    <mat-icon>logout</mat-icon>
   </button>
 </mat-toolbar>
 
 <div class="app-container" >
+  <p>
+    <small>Seja bem vindo, {{(user$|async)?.name}}!</small>
+  </p>
   <mat-action-list role="list">
     <h1 class="text-center">Selecione uma enquete</h1>
     @for (survey of surveys;track survey) {
@@ -23,4 +31,10 @@
       <mat-divider></mat-divider>
     }
   </mat-action-list>
+
+  @if (isLoading) {
+    <div class="flex-row x-center">
+      <mat-spinner diameter="40" ></mat-spinner>
+    </div>
+  }
 </div>
